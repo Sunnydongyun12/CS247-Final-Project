@@ -81,6 +81,7 @@ def bow(X_train, X_test, y_train, y_test):
     print('the final tfidf test matrix with shape {}'.format(X_test_tfidf.shape))
 
     print('yeah! done!')
+<<<<<<< HEAD
     with open('data/X_train_tfidf_rest', 'wb') as fp:
         pickle.dump(X_train_tfidf, fp)
     with open('data/X_test_tfidf_rest', 'wb') as fp:
@@ -88,6 +89,15 @@ def bow(X_train, X_test, y_train, y_test):
     with open('data/y_train_rest', 'wb') as fp:
         pickle.dump(y_train, fp)
     with open('data/y_test_rest', 'wb') as fp:
+=======
+    with open('.data/X_train_tfidf', 'wb') as fp:
+        pickle.dump(X_train_tfidf, fp)
+    with open('.data/X_test_tfidf', 'wb') as fp:
+        pickle.dump(X_test_tfidf, fp)
+    with open('.data/y_train', 'wb') as fp:
+        pickle.dump(y_train, fp)
+    with open('.data/y_test', 'wb') as fp:
+>>>>>>> 13a7294e742dc499bddd77a636c3564657172f59
         pickle.dump(y_test, fp)
     print('The test and training data are dumped in X_train_tfidf, X_test_tfidf, y_train, y_test')
 
