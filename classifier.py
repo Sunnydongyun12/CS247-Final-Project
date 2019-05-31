@@ -37,7 +37,7 @@ class Classifier:
 
     def logistic_regression(self):
         print('Training on logistic regression model......')
-        model =  LogisticRegression(random_state=0, solver='lbfgs',multi_class='multinomial', max_iter=10000, verbose=1, n_jobs=4)
+        model =  LogisticRegression(random_state=0, solver='lbfgs',multi_class='multinomial', max_iter=10000, n_jobs=4)
         model.fit(self.train_data, self.train_label)
         predicted = model.predict(self.test_data)
         assert predicted.shape == self.test_label.shape
@@ -46,7 +46,7 @@ class Classifier:
 
     def mlp(self):
         print('Training on multi-layer perceptron model......')
-        model = MLPClassifier(random_state=0, hidden_layer_sizes=(2000,2000), max_iter=10000, verbose=True)
+        model = MLPClassifier(random_state=0, hidden_layer_sizes=(20,), max_iter=10000)
         for i in range(0,self.train_data.shape[0],1000):
             print(i)
             clf = model.partial_fit(self.train_data[i:i+1000], self.train_label[i:i+1000], classes=[0,1,2,3,4])
@@ -57,7 +57,7 @@ class Classifier:
 
 
 if __name__=="__main__":
-    classifier = Classifier('reviews.p','labels.p')
+    classifier = Classifier('doc2vec_reviews.p','doc2vec_labels.p')
     # classifier.naive_bayes()
-    # classifier.logistic_regression()
+    classifier.logistic_regression()
     classifier.mlp()
