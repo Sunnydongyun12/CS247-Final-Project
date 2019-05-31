@@ -11,18 +11,32 @@ import pickle
 
 def getRawData(filename):
     print('loading data...')
-    with open(filename, 'r') as f:    
+    with open('data/train.json', 'r') as f:    
         datastore = json.load(f)
+    with open('data/test.json', 'r') as f:    
+        datastore_test = json.load(f)
     print('loading success!!!')
 
-    review_list = []
-    label_lists = []
-    for key, value in datastore.items():
-        review_list.append(key)
-        label_lists.append(value)
+    # review_list = []
+    # label_lists = []
+    # for key, value in datastore.items():
+    #     review_list.append(key)
+    #     label_lists.append(value)
 
-    X_train, X_test, y_train, y_test = train_test_split(review_list, label_lists, test_size=0.2)
-    print('size of lists are {}'.format(len(label_lists)))
+    X_train = []
+    y_train = []
+    for key, value in datastore.items():
+        X_train.append(key)
+        y_train.append(value)
+    
+    X_test = []
+    y_test = []
+    for key, value in datastore_test.items():
+        X_test.append(key)
+        y_test.append(value)
+
+    # X_train, X_test, y_train, y_test = train_test_split(review_list, label_lists, test_size=0.2)
+    print('size of training lists are {}'.format(len(X_train)))
     return X_train, X_test, y_train, y_test
 
 
@@ -67,18 +81,18 @@ def bow(X_train, X_test, y_train, y_test):
     print('the final tfidf test matrix with shape {}'.format(X_test_tfidf.shape))
 
     print('yeah! done!')
-    with open('X_train_tfidf', 'wb') as fp:
+    with open('data/X_train_tfidf_rest', 'wb') as fp:
         pickle.dump(X_train_tfidf, fp)
-    with open('X_test_tfidf', 'wb') as fp:
+    with open('data/X_test_tfidf_rest', 'wb') as fp:
         pickle.dump(X_test_tfidf, fp)
-    with open('y_train', 'wb') as fp:
+    with open('data/y_train_rest', 'wb') as fp:
         pickle.dump(y_train, fp)
-    with open('y_test', 'wb') as fp:
+    with open('data/y_test_rest', 'wb') as fp:
         pickle.dump(y_test, fp)
     print('The test and training data are dumped in X_train_tfidf, X_test_tfidf, y_train, y_test')
 
 if __name__ == '__main__':
-    filename = './data/reviews_label.txt'
+    filename = './data/train.txt'
     X_train, X_test, y_train, y_test = getRawData(filename)
     bow(X_train, X_test, y_train, y_test)
 

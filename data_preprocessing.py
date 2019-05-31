@@ -18,6 +18,8 @@
 import os
 import spacy
 import xml.etree.ElementTree as ET
+import json
+
 nlp = spacy.load("en")
 
 def aspect2num(aspect):
@@ -48,24 +50,27 @@ def data_preprocess(input_file, save_file):
     tree = ET.parse(input_file)
     root = tree.getroot()
     sentences, aspects, labels = [], [], []
-    with open(save_file, 'w') as f:
-        for sentence in root:
-            sptoks = nlp(sentence.find('text').text)
-            sentences.append(sptoks)
-            f.write("%s\n" % sentences[-1])
-            if len(sptoks.text.strip()) != 0:
-                ids = []
-                temp_po = [0, 0, 0, 0, 0]
-                for asp_terms in sentence.iter('aspectCategories'):
-                    for asp_term in asp_terms.findall('aspectCategory'):
-                        if asp_term.get('polarity') == 'conflict':
-                            continue
-                        aspect = nlp(asp_term.get('category'))
-                        polarity = asp_term.get('polarity') 
-                        temp_po = get_aspect_polarity_vector(aspect.text, polarity, temp_po)
-            labels.append(temp_po)
-            f.write("%s\n" % labels[-1])
-        print("Read %s sentences from %s" % (len(sentences), input_file))
+    data_label_dict = {}
+    for sentence in root:
+        sptoks = nlp(sentence.find('text').text)
+        sentences.append(sptoks)
+        if len(sptoks.text.strip()) != 0:
+            ids = []
+            temp_po = [0, 0, 0, 0, 0]
+            for asp_terms in sentence.iter('aspectCategories'):
+                for asp_term in asp_terms.findall('aspectCategory'):
+                    if asp_term.get('polarity') == 'conflict':
+                        continue
+                    aspect = nlp(asp_term.get('category'))
+                    polarity = asp_term.get('polarity') 
+                    temp_po = get_aspect_polarity_vector(aspect.text, polarity, temp_po)
+        labels.append(temp_po)
+        data_label_dict[str(sentences[-1])] = labels[-1]
+    print("Read %s sentences from %s" % (len(sentences), input_file))
+    json_str = json.dumps(data_label_dict)
+    f = open(save_file,"w")
+    f.write(json_str)
+    f.close()
 
 
 
