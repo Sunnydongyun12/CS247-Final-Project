@@ -1,3 +1,15 @@
 data after preprocessing: train_data.txt, test_data.txt
 label: [food, service, price, ambience, anecdotes/miscellaneous]
 polarity: 1 for postive, -1 for negative
+
+test.json: contains a json dictionary, key is the data, value is the data label, use json.load to load the data
+
+train.json: contains a json dictionary, key is the data, value is the data label,  use json.load to load the data
+
+X_test_tfidf_rest: pickle file, bow embedding results, a tfidf matrix,  use pickle.load to load the data
+
+X_train_tfidf_rest: pickle file, bow embedding results, a tfidf matrix,  use pickle.load to load the data
+
+y_test_rest：pickle file, label for testset, a list of 5*1 vectors, use pickle.load to load the data
+
+y_train_rest: pickle file, label for trainset, a list of 5*1 vectors, use pickle.load to load the data
