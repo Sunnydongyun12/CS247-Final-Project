@@ -12,7 +12,6 @@ class Classifier:
     def __init__(self, data_file, label_file, ratio=0.8):
         with open(data_file, 'rb') as f:
             self.raw_data = pickle.load(f)
-
         with open(label_file, 'rb') as f:
             labels = pickle.load(f)
         print('data loaded')
