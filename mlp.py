@@ -2,7 +2,6 @@
 # coding: utf-8
 from sklearn.neural_network import MLPRegressor
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 import pickle
@@ -82,6 +81,10 @@ def main():
     y_true = np.asarray(y_test_rest)
     y_pred_test = mlp.predict(X_test_tfidf_rest)
     y_pred_train = mlp.predict(X_train_tfidf_rest)
+
+
+    print(y_pred_test)
+    print(y_true)
 
     mse_test = mean_squared_error(y_true, y_pred_test)
     mse_train = mean_squared_error(y_train_rest, y_pred_train)
