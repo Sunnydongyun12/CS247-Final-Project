@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 from models import aspectNet
 from sklearn.neural_network._base import ACTIVATIONS
+from tqdm import tqdm
 
 class Classifier:
     def __init__(self, data_file, label_file, ratio=0.8):
@@ -62,20 +63,28 @@ class Classifier:
         correct = 0
         total = 0
         net.eval()
-        for batch_num in range(0, self.test_data.shape[0], batch_size):
+        pbar = tqdm(range(0, self.test_data.shape[0], batch_size))
+        for batch_num in pbar:
             total += 1
-            inputs, actual_val = self.test_data[batch_num:batch_num+batch_size,:], self.test_label[batch_num:batch_num+batch_size]
+            if batch_num + batch_size > self.test_data.shape[0]:
+                end = self.train_data.shape[0]
+            else:
+                end = batch_num + batch_size
+            inputs_, actual_val = self.test_data[batch_num:end,:], self.test_label[batch_num:end]
             # perform classification
-            inputs = torch.from_numpy(inputs)
-            actual_val = torch.from_numpy(actual_val)
-            predicted_val = net(torch.autograd.Variable(inputs))
+            inputs = torch.from_numpy(inputs_.toarray()).float().cuda()
+            hidden_feature = self.get_hidden_feature(inputs_.toarray(), 1)
+            hidden_feature = torch.from_numpy(hidden_feature).float().cuda()
+            actual_val = torch.from_numpy(actual_val).cuda()
+            predicted_val = net(torch.autograd.Variable(inputs),torch.autograd.Variable(hidden_feature))
             # convert 'predicted_val' GPU tensor to CPU tensor and extract the column with max_score
             predicted_val = predicted_val.data
             max_score, idx = torch.max(predicted_val, 1)
+            assert idx.shape==actual_val.shape
             # compare it with actual value and estimate accuracy
             correct += (idx == actual_val).sum()
-
-        print("Classifier Accuracy: ", correct / total * 100)
+            pbar.set_description("processing batch %s" % str(batch_num))
+        print("Classifier Accuracy: ", correct.cpu().numpy() / 2000.0 )
 
     def get_hidden_feature(self, data, layer):
         for i in range(layer):
@@ -83,7 +92,7 @@ class Classifier:
             data = output
         return output
 
-    def aspect_mlp(self, aspectfile, numEpochs, batch_size):
+    def aspect_mlp(self, aspectfile, numEpochs, batch_size, save_file, lr):
         with open(aspectfile, 'rb') as f:
             self.aspect_model = pickle.load(f)
         print('model loaded')
@@ -93,24 +102,30 @@ class Classifier:
         loss_func = nn.CrossEntropyLoss()
         net = aspectNet(41652)
         # SGD used for optimization, momentum update used as parameter update
-        optimization = torch.optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
+        optimization = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+        net.cuda()
+        loss_func.cuda()
         for epoch in range(numEpochs):
 
             # training set -- perform model training
             epoch_training_loss = 0.0
             num_batches = 0
-            for batch_num in range(0, self.train_data.shape[0], batch_size):  # 'enumerate' is a super helpful function
+            pbar = tqdm(range(0, self.train_data.shape[0], batch_size))
+            for batch_num in pbar:  # 'enumerate' is a super helpful function
                 # split training data into inputs and labels
-                inputs_, labels_ = self.train_data[batch_num:batch_num+batch_size,:], self.train_label[batch_num:batch_num+batch_size]  # 'training_batch' is a list
-                inputs = torch.from_numpy(inputs_.toarray()).float()
-                labels = torch.from_numpy(labels_)
+                if batch_num+batch_size>self.train_data.shape[0]:
+                    end = self.train_data.shape[0]
+                else:
+                    end = batch_num+batch_size
+                inputs_, labels_ = self.train_data[batch_num:end,:], self.train_label[batch_num:end]  # 'training_batch' is a list
+                inputs = torch.from_numpy(inputs_.toarray()).float().cuda()
+                labels = torch.from_numpy(labels_).cuda()
                 # wrap data in 'Variable'
                 inputs, labels = torch.autograd.Variable(inputs), torch.autograd.Variable(labels)
                 # Make gradients zero for parameters 'W', 'b'
                 optimization.zero_grad()
                 hidden_feature = self.get_hidden_feature(inputs_.toarray(), 1)
-                hidden_feature = torch.from_numpy(hidden_feature).float()
+                hidden_feature = torch.from_numpy(hidden_feature).float().cuda()
                 # forward, backward pass with parameter update
                 forward_output = net(inputs, hidden_feature)
                 loss = loss_func(forward_output, labels)
@@ -119,13 +134,17 @@ class Classifier:
                 # calculating loss
                 epoch_training_loss += loss.data.item()
                 num_batches += 1
-                print(loss.data.item())
+                # print(loss.data.item())
+                pbar.set_description("processing batch %s" % str(batch_num))
             print("epoch: ", epoch, ", loss: ", epoch_training_loss / num_batches)
-            # self.test(net, batch_size)
+            self.test(net, batch_size=2000)
+            if epoch%10 == 0:
+                save_path = save_file+'model_' +str(epoch)+'.pth'
+                torch.save(net.state_dict(), save_path)
 
 if __name__=="__main__":
     classifier = Classifier('reviews.p','labels.p')
     # classifier.naive_bayes()
     # classifier.logistic_regression()
     # classifier.mlp()
-    classifier.aspect_mlp('feature_regression_mlp.p', 1, 256)
+    classifier.aspect_mlp('feature_regression_mlp.p', 50, 2000, './', 0.01)
