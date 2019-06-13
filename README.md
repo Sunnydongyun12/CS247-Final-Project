@@ -1,6 +1,9 @@
 FinalProject_Group8.zip
+
 |
+
 |--- CS_247_proposal.pdf
+
 |--- data 
 |	  |--- yelp
 |     |     |--- bow
