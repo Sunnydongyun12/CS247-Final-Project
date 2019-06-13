@@ -1,6 +1,3 @@
-# CS247-Final-Project
-Optimization of Sentiment Classification using Aspect Analysis
-
 FinalProject_Group8.zip
 |
 |--- CS_247_proposal.pdf
@@ -63,8 +60,12 @@ FinalProject_Group8.zip
 |--- aspect_extraction_bow.py 
 |--- aspect_extraction_doc2vec.py
 |--- baseline.py
-|--- model1.py
-|--- model2.py
+|--- model1_bow_logistic.py
+|--- model1_bow_mlp.py
+|--- model1_doc2vec_logistic.py
+|--- model1_doc2vec_mlp.py
+|--- model2_bow.py
+|--- model2_doc2vec.py
 |--- models2_utils.py
 |--- rest_bow.py
 |--- rest_doc2vec.py
@@ -75,21 +76,23 @@ FinalProject_Group8.zip
 
 
 The google drive link of our data: https://drive.google.com/drive/folders/1Rzp888_zlH8Bh__Dzerf4wJr95Zc6qSl 
-Before run, download and drag all data file into the 'data' folder following the above hierarchy
+Before run, download and drag all dataset and model file into the 'data' and 'model' folder following the above hierarchy
 
 
-The basic dataset you need is 'train.xml' and 'test.xml' for restaurant dataset, and reviews_label.txt for yelp dataset.
+The basic dataset you need is 'train.xml' and 'test.xml' for restaurant dataset, and 'reviews_label.txt' for yelp dataset.
 
 Our workflow is
-      data preprocessing(rest_preprocess.py, yelp_preprocess.py) 
-  --> embedding (rest_bow.py, rest_doc2vec.py, yelp_bow.py, yelp_preprocess.py) 
+      data preprocessing                         (rest_preprocess.py, yelp_preprocess.py) 
+  --> embedding                                  (yelp_bow.py, yelp_preprocess.py, rest_bow.py, rest_doc2vec.py) 
   --> aspect polarity extraction module training (aspect_extraction_bow.py, aspect_extraction_doc2vec.py)
-  --> sentiment classification (model1.py, model2.py)
+  --> sentiment classification                   (model1_bow_logistic.py, model1_bow_mlp.py, model1_doc2vec_logistic.py, model1_doc2vec_mlp.py, model2_bow.py, model2_doc2vec.py)
 
-If all dataset are loaded under the data folder, you can run each file shown above in the pipline separately,
-otherwise, load the basic datasets, and run code follows the above workflow
+If all dataset are loaded under the data folder, you can run each file shown above separately,
+otherwise, load the basic datasets, and run code following the above workflow
 
-run 'python baseline.py' to show all base line evaluation results
+To run any file above type the command 'python filename.py', without single qoute.
+
+run 'python baseline.py' to show all base line evaluation results.
 
 
 
