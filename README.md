@@ -1,9 +1,7 @@
+```
 FinalProject_Group8.zip
-
 |
-
 |--- CS_247_proposal.pdf
-
 |--- data 
 |	  |--- yelp
 |     |     |--- bow
@@ -76,7 +74,7 @@ FinalProject_Group8.zip
 |--- yelp_bow.py (preprocess Yelp data)
 |--- yelp_doc2vec.py (preprocess Yelp data)
 |--- yelp_preprocess.py
-
+```
 
 The google drive link of our data: https://drive.google.com/drive/folders/1Rzp888_zlH8Bh__Dzerf4wJr95Zc6qSl 
 Before run, download and drag all dataset and model file into the 'data' and 'model' folder following the above hierarchy
